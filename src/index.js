@@ -1,7 +1,7 @@
 // @flow
 
 import mkSelect from 'resell-select'
-import type { Select, Selector } from 'resell-select'
+import type { Select, Selector, Node } from 'resell-select'
 import { Observable } from 'rxjs'
 import * as rx from 'rxjs/operators'
 
@@ -84,7 +84,10 @@ const mkResell = (page: PuppeteerPage): Resell => {
   resell._queryElementHandle = (query: Selector) => Observable.create((o) => {
     Observable.fromPromise(
       page.evaluateHandle(
-        (query) => window.__RESELL_SELECT_ROOT__.query(query).domNode,
+        (query) => {
+          const node: ?Node = window.__RESELL_SELECT_ROOT__.query(query)
+          return node && node.domNode
+        },
         query
       )
     ).pipe(
