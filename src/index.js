@@ -136,7 +136,7 @@ const mkResell = (page: PuppeteerPage): Resell => {
     resell._queue.push(
       Observable.create((o) => {
         Observable.fromPromise(
-          page.screenshot({ ...options, ...defaultOptions })
+          page.screenshot(Object.assign({}, options, defaultOptions))
         )
           .subscribe(o)
       })
