@@ -47,6 +47,8 @@ export interface Resell {
   (Selector): ResellElement,
   waitFor: (Selector) => Observable<ResellElement>,
   drain: () => Observable<mixed>,
+  screenshot: (options?: Object) => Observable<void>,
+
   _queue: Array<Observable<mixed>>,
   _queryElementHandle: (Selector) => PuppeteerElementHandle,
 }
@@ -124,6 +126,28 @@ const mkResell = (page: PuppeteerPage): Resell => {
       rx.takeLast(1)
     )
   }
+
+  resell.screenshot = (options) => {
+    const defaultOptions = {
+      fullPage: true,
+      path: 'screenshot.png',
+    }
+
+    resell._queue.push(
+      Observable.create((o) => {
+        Observable.fromPromise(
+          page.screenshot({ ...options, ...defaultOptions })
+        )
+          .subscribe(o)
+      })
+    )
+
+    return resell.drain().pipe(
+      rx.toArray(),
+      rx.mapTo(null)
+    )
+  }
+
   resell.drain = () => Observable.of(true).pipe(
     rx.switchMap(() => Observable.from(resell._queue)),
     rx.concatAll()

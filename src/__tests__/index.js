@@ -52,6 +52,7 @@ if (!document.body) throw new Error()
 document.body.appendChild(root)
 
 const mkPuppeteerPage = () => ({
+  screenshot: jest.fn(async () => {}),
   evaluate: jest.fn(async (fn, ...args) => {
     return await fn(...args)
   }),
@@ -135,5 +136,16 @@ describe('ResellElement.type', () => {
     const { $, selectNode } = await setup()
     await $('h1').type('my text').toPromise()
     expect(selectNode._typed).toBe('my text')
+  })
+})
+
+describe('$.screenshot', () => {
+  it('should create a screenshot', async () => {
+    const { $, page } = await setup()
+    await $.screenshot().toPromise()
+    expect(page.screenshot).toHaveBeenCalledWith({
+      path: 'screenshot.png',
+      fullPage: true,
+    })
   })
 })
