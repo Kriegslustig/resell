@@ -45,7 +45,8 @@ type ResellElement = {|
 
 export interface Resell {
   (Selector): ResellElement,
-  waitFor: (Selector) => Observable<ResellElement>,
+  waitFor: (Selector, timeout?: number, interval?: number) =>
+    Observable<ResellElement>,
   drain: () => Observable<mixed>,
   screenshot: (options?: Object) => Observable<void>,
 
@@ -104,14 +105,20 @@ const mkResell = (page: PuppeteerPage): Resell => {
     ).subscribe(o)
   })
 
-  resell.waitFor = (query: Selector) => {
+  resell.waitFor = (query: Selector, timeout, interval) => {
     resell._queue.push(Observable.create((o) => {
       Observable.fromPromise(
         page.evaluateHandle(
-          async (query: Selector) => {
-            return await window.__RESELL_SELECT_ROOT__.waitFor(query)
+          async (query: Selector, timeout, interval) => {
+            return await window.__RESELL_SELECT_ROOT__.waitFor(
+              query,
+              timeout,
+              interval
+            )
           },
-          query
+          query,
+          timeout,
+          interval
         )
       ).pipe(
         rx.map((handle: PuppeteerJSHandle) => {
