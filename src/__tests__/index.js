@@ -10,6 +10,7 @@ jest.mock('resell-select', () => {
   const mkSelect = () => ({
     fromRoot: () => {
       const node = {
+        reactNode: {},
         _clicked: false,
         _typed: '',
         query: () => ({

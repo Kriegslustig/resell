@@ -25,8 +25,11 @@ const init = ({ page, rootId }: Options): Observable<Resell> =>
 
         const _mkSelect: Function = new Function(`return ${mkSelectStr}`)
         const select: Select = _mkSelect()()
+        const selectRoot = select.fromRoot(rootNode)
 
-        window.__RESELL_SELECT_ROOT__ = select.fromRoot(rootNode)
+        if (!selectRoot.reactNode) throw new Error('No react instance found on root node')
+
+        window.__RESELL_SELECT_ROOT__ = selectRoot
       },
       mkSelect.toString(),
       rootId
@@ -93,7 +96,7 @@ const mkResell = (page: PuppeteerPage): Resell => {
     ).pipe(
       rx.map((handle: PuppeteerJSHandle) => {
         const element = handle.asElement()
-        if (!element) return o.error(new Error('Element not found'))
+        if (!element) return o.error(new Error(`Element not found. selector: ${query}`))
         return element
       })
     ).subscribe(o)
