@@ -110,11 +110,12 @@ const mkResell = (page: PuppeteerPage): Resell => {
       Observable.fromPromise(
         page.evaluateHandle(
           async (query: Selector, timeout, interval) => {
-            return await window.__RESELL_SELECT_ROOT__.waitFor(
+            const node = await window.__RESELL_SELECT_ROOT__.waitFor(
               query,
               timeout,
               interval
             )
+            return node && node.domNode
           },
           query,
           timeout,
@@ -123,7 +124,7 @@ const mkResell = (page: PuppeteerPage): Resell => {
       ).pipe(
         rx.map((handle: PuppeteerJSHandle) => {
           const element = handle.asElement()
-          if (!element) return o.error(new Error('Element not found'))
+          if (!element) throw new Error('Element not found')
           return element
         })
       ).subscribe(o)

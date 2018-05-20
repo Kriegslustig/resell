@@ -30,7 +30,7 @@ jest.mock('resell-select', () => {
         _waitedFor: null,
         waitFor: (query) => new Promise((res) => {
           node._waitedFor = query
-          res({ _isElement: true })
+          res({ domNode: { _isElement: true } })
         })
       }
 
