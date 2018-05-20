@@ -156,7 +156,11 @@ const mkResell = (page: PuppeteerPage): Resell => {
   }
 
   resell.drain = () => Observable.of(true).pipe(
-    rx.switchMap(() => Observable.from(resell._queue)),
+    rx.switchMap(() => {
+      const queue = resell._queue
+      resell._queue = []
+      return Observable.from(queue)
+    }),
     rx.concatAll()
   )
   resell._queue = []
