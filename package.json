@@ -16,6 +16,10 @@
   ],
   "author": "Luca Nils Schmid <npm@ls7.ch>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kriegslustig/resell.git"
+  },
   "devDependencies": {
     "@neutrinojs/jest": "^8.2.3",
     "@neutrinojs/library": "^8.2.3",
