@@ -47,6 +47,7 @@ export interface Resell {
   (Selector): ResellElement,
   waitFor: (Selector, timeout?: number, interval?: number) =>
     Observable<ResellElement>,
+  wait: (number) => Observable<void>,
   drain: () => Observable<mixed>,
   screenshot: (options?: Object) => Observable<void>,
 
@@ -122,6 +123,9 @@ const mkResell = (page: PuppeteerPage): Resell => {
           interval
         )
       ).pipe(
+        rx.catchError(() =>
+          Observable.throw(new Error(`waitFor timed out: ${query}`))
+        ),
         rx.map((handle: PuppeteerJSHandle) => {
           const element = handle.asElement()
           if (!element) throw new Error('Element not found')
@@ -132,6 +136,14 @@ const mkResell = (page: PuppeteerPage): Resell => {
 
     return resell.drain().pipe(
       rx.takeLast(1)
+    )
+  }
+
+  resell.wait = (delay) => {
+    resell._queue.push(
+      Observable.of(null).pipe(
+        rx.delay(delay)
+      )
     )
   }
 
